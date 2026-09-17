@@ -1,7 +1,13 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <HelloWorld />
+  <div id="app">
+    <nav style="margin-bottom: 20px;">
+      <router-link to="/students">Students</router-link> | 
+      <router-link to="/courses">Courses</router-link>
+    </nav>
+    <router-view />
+  </div>
 </template>
+
+<script setup>
+// App layout component
+</script>

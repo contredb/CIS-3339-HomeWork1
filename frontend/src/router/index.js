@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// We will create these views in the next steps
+import StudentsView from '../views/StudentsView.vue'
+
 const routes = [
   { path: '/', redirect: '/students' },
-  // Add routes here later
+  { path: '/students', component: StudentsView }
 ]
 
 const router = createRouter({
