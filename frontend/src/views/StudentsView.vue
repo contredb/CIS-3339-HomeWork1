@@ -8,6 +8,7 @@
       <label>Student Name: </label>
       <input v-model="searchName" placeholder="Enter name" />
       <button @click="searchStudents">Search</button>
+      <button @click="clearResults" style="margin-left: 5px;">Clear</button>
     </div>
 
     <!-- Add Student Form -->
@@ -45,7 +46,7 @@
           <td><button @click="deleteStudent(student.name)">Delete</button></td>
         </tr>
         <tr v-if="students.length === 0">
-          <td colspan="5" style="text-align: center;">No students found</td>
+          <td colspan="5" style="text-align: center;">No students searched or found</td>
         </tr>
       </tbody>
     </table>
@@ -65,12 +66,21 @@ const successMessage = ref('')
 const searchStudents = async () => {
   try {
     errorMessage.value = ''
+    successMessage.value = ''
     const response = await axios.post('http://localhost:3000/find-student', { name: searchName.value })
     students.value = [response.data]
   } catch (err) {
     errorMessage.value = 'Student not found.'
+    successMessage.value = ''
     students.value = []
   }
+}
+
+const clearResults = () => {
+  students.value = []
+  searchName.value = ''
+  errorMessage.value = ''
+  successMessage.value = ''
 }
 
 const addStudent = async () => {
@@ -79,18 +89,20 @@ const addStudent = async () => {
     successMessage.value = ''
     const response = await axios.post('http://localhost:3000/add-student', newStudent.value)
     successMessage.value = response.data.message || 'Student added successfully!'
-    students.value.push({ ...newStudent.value })
     newStudent.value = { name: '', id: '', phone: '', zip: '' }
   } catch (err) {
-    errorMessage.value = err.response?.data?.error || 'Failed to add student.'
+    successMessage.value = ''
+    errorMessage.value = err.response?.data?.error || 'Failed to add student. ID might be a duplicate.'
   }
 }
 
 const deleteStudent = async (name) => {
   try {
     errorMessage.value = ''
+    successMessage.value = ''
     await axios.post('http://localhost:3000/delete-student', { name })
     students.value = students.value.filter(s => s.name !== name)
+    successMessage.value = 'Student deleted successfully!'
   } catch (err) {
     errorMessage.value = 'Failed to delete student.'
   }

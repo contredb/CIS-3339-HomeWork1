@@ -6,35 +6,32 @@
     <div style="margin-bottom: 20px;">
       <h3>Add a Course</h3>
       <form @submit.prevent="addCourse">
-        <div><label>Course Name: </label><input v-model="newCourse.name" required /></div>
-        <div><label>Course Code: </label><input v-model="newCourse.code" required /></div>
-        <div><label>Credits: </label><input v-model="newCourse.credits" type="number" required /></div>
+        <div><label>Course ID: </label><input v-model="newCourse.courseId" required /></div>
+        <div><label>Course Name: </label><input v-model="newCourse.courseName" required /></div>
         <button type="submit" style="margin-top: 5px;">Add Course</button>
       </form>
       <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
       <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
     </div>
 
-    <!-- Results Table -->
+    <!-- Courses List Table -->
     <h3>Courses List:</h3>
     <table border="1" cellpadding="5" style="border-collapse: collapse;">
       <thead>
         <tr>
+          <th>Course ID</th>
           <th>Course Name</th>
-          <th>Code</th>
-          <th>Credits</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="course in courses" :key="course.code">
-          <td>{{ course.name }}</td>
-          <td>{{ course.code }}</td>
-          <td>{{ course.credits }}</td>
-          <td><button @click="deleteCourse(course.code)">Delete</button></td>
+        <tr v-for="course in courses" :key="course.courseId">
+          <td>{{ course.courseId }}</td>
+          <td>{{ course.courseName }}</td>
+          <td><button @click="deleteCourse(course.courseId)">Delete</button></td>
         </tr>
         <tr v-if="courses.length === 0">
-          <td colspan="4" style="text-align: center;">No courses found</td>
+          <td colspan="3" style="text-align: center;">No courses found</td>
         </tr>
       </tbody>
     </table>
@@ -42,38 +39,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const courses = ref([])
-const newCourse = ref({ name: '', code: '', credits: '' })
+const newCourse = ref({ courseId: '', courseName: '' })
 const errorMessage = ref('')
 const successMessage = ref('')
 
-const addCourse = () => {
+const fetchCourses = async () => {
   try {
     errorMessage.value = ''
-    successMessage.value = ''
-    
-    // Check for duplicate course code
-    if (courses.value.some(c => c.code === newCourse.value.code)) {
-      errorMessage.value = 'Course code already exists.'
-      return
-    }
-
-    courses.value.push({ ...newCourse.value })
-    successMessage.value = 'Course added successfully!'
-    newCourse.value = { name: '', code: '', credits: '' }
+    const response = await axios.get('http://localhost:3000/courses')
+    courses.value = response.data
   } catch (err) {
-    errorMessage.value = 'Failed to add course.'
+    errorMessage.value = 'Failed to load courses.'
   }
 }
 
-const deleteCourse = (code) => {
+const addCourse = async () => {
   try {
     errorMessage.value = ''
-    courses.value = courses.value.filter(c => c.code !== code)
+    successMessage.value = ''
+    const response = await axios.post('http://localhost:3000/add-course', newCourse.value)
+    successMessage.value = response.data.message || 'Course added successfully!'
+    newCourse.value = { courseId: '', courseName: '' }
+    fetchCourses()
+  } catch (err) {
+    successMessage.value = ''
+    errorMessage.value = err.response?.data?.error || 'Failed to add course. ID might be a duplicate.'
+  }
+}
+
+const deleteCourse = async (courseId) => {
+  try {
+    errorMessage.value = ''
+    successMessage.value = ''
+    await axios.post('http://localhost:3000/delete-course', { courseId })
+    fetchCourses()
+    successMessage.value = 'Course deleted successfully!'
   } catch (err) {
     errorMessage.value = 'Failed to delete course.'
   }
 }
+
+onMounted(() => {
+  fetchCourses()
+})
 </script>
