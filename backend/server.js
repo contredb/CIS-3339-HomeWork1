@@ -9,6 +9,7 @@ app.use(express.json());
 
 const STUDENTS_FILE = path.join(__dirname, 'students.json');
 const COURSES_FILE = path.join(__dirname, 'courses.json');
+const ENROLLMENTS_FILE = path.join(__dirname, 'enrollments.json');
 
 // --- Helper Functions for Students ---
 async function loadStudents() {
@@ -52,10 +53,28 @@ async function saveCourses(courses) {
     }
 }
 
+// --- Helper Functions for Enrollments ---
+async function loadEnrollments() {
+    try {
+        const data = await fs.promises.readFile(ENROLLMENTS_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') return [];
+        console.error('Error reading enrollments file:', error);
+        return [];
+    }
+}
 
-// ==========================================
+async function saveEnrollments(enrollments) {
+    try {
+        await fs.promises.writeFile(ENROLLMENTS_FILE, JSON.stringify(enrollments, null, 2), 'utf8');
+    } catch (error) {
+        console.error('Error writing enrollments file:', error);
+        throw error;
+    }
+}
+
 // STUDENT ENDPOINTS
-// ==========================================
 
 // Endpoint to get all students (if needed)
 app.get('/students', async (req, res) => {
@@ -140,10 +159,7 @@ app.post('/delete-student', async (req, res) => {
     }
 });
 
-
-// ==========================================
 // COURSE ENDPOINTS
-// ==========================================
 
 // Endpoint to list all courses
 app.get('/courses', async (req, res) => {
@@ -207,6 +223,60 @@ app.post('/delete-course', async (req, res) => {
     }
 });
 
+// ENROLLMENT ENDPOINTS
+
+// Endpoint to enroll a student in a course (preventing duplicate enrollments)
+app.post('/enroll-student', async (req, res) => {
+    try {
+        const { studentId, courseId } = req.body;
+        if (!studentId || !courseId) {
+            return res.status(400).send({ error: 'Both student ID and course ID are required' });
+        }
+
+        const enrollments = await loadEnrollments();
+
+        // Check for duplicate enrollment
+        const existing = enrollments.find(e => e.studentId === studentId && e.courseId === courseId);
+        if (existing) {
+            return res.status(400).send({ error: 'Student is already enrolled in this course.' });
+        }
+
+        const newEnrollment = { studentId, courseId };
+        enrollments.push(newEnrollment);
+        await saveEnrollments(enrollments);
+
+        res.status(201).send({ message: 'Student enrolled successfully!', enrollment: newEnrollment });
+    } catch (error) {
+        console.error('Error enrolling student:', error);
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
+
+// Endpoint to get all students enrolled in a specific course
+app.post('/course-enrollments', async (req, res) => {
+    try {
+        const { courseId } = req.body;
+        if (!courseId) {
+            return res.status(400).send({ error: 'Course ID is required' });
+        }
+
+        const enrollments = await loadEnrollments();
+        const students = await loadStudents();
+
+        // Find all student IDs enrolled in this course
+        const enrolledStudentIds = enrollments
+            .filter(e => e.courseId === courseId)
+            .map(e => e.studentId);
+
+        // Match IDs back to full student objects
+        const enrolledStudents = students.filter(s => enrolledStudentIds.includes(s.id));
+
+        res.send(enrolledStudents);
+    } catch (error) {
+        console.error('Error fetching course enrollments:', error);
+        res.status(500).send({ error: 'Internal server error' });
+    }
+});
 
 // Start the server
 const PORT = 3000;
