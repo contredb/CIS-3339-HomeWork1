@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -198,6 +199,15 @@ app.post('/course-enrollments', async (req, res) => {
     }
 });
 
+// Serve Vue production build assets from the frontend dist folder
+const frontendDistPath = path.join(__dirname, '../frontend/dist'); 
+app.use(express.static(frontendDistPath));
+
+// Fallback to index.html for Vue Router (SPA support)
+// Use a regular expression catch-all to prevent path-to-regexp errors
+app.get(/^[^\/].*$/, (req, res) => {
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+});
 
 // Start the server
 const PORT = 3000;
