@@ -3,7 +3,7 @@
     <h2>Enrollment Management</h2>
 
     <!-- Enroll Student Form -->
-    <div style="margin-bottom: 30px; border: 1px solid #ccc; padding: 15px;">
+    <div style="margin-bottom: 30px">
       <h3>Enroll a Student in a Course</h3>
       <form @submit.prevent="enrollStudent">
         <div style="margin-bottom: 10px;">
@@ -33,7 +33,7 @@
     </div>
 
     <!-- View Course Roster -->
-    <div style="border: 1px solid #ccc; padding: 15px;">
+    <div>
       <h3>View Course Roster</h3>
       <div style="margin-bottom: 10px;">
         <label>Select Course to View Roster: </label>
@@ -45,7 +45,7 @@
         </select>
       </div>
 
-      <table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">
+      <table border="1" cellpadding="5" style="border-collapse: collapse; width: auto; min-width: 450px;">
         <thead>
           <tr>
             <th>Student Name</th>
@@ -87,10 +87,10 @@ const successMessage = ref('')
 // Load students and courses from backend for dropdowns
 const fetchDropdownData = async () => {
   try {
-    const studentRes = await axios.get('http://localhost:3000/students')
+    const studentRes = await axios.get('http://localhost:3000/api/students')
     students.value = studentRes.data
 
-    const courseRes = await axios.get('http://localhost:3000/courses')
+    const courseRes = await axios.get('http://localhost:3000/api/courses')
     courses.value = courseRes.data
   } catch (err) {
     errorMessage.value = 'Failed to load dropdown data from backend.'
@@ -102,7 +102,7 @@ const enrollStudent = async () => {
     errorMessage.value = ''
     successMessage.value = ''
     
-    const response = await axios.post('http://localhost:3000/enroll-student', {
+    const response = await axios.post('http://localhost:3000/api/enroll-student', {
       studentId: selectedStudentId.value,
       courseId: selectedCourseId.value
     })
@@ -124,7 +124,7 @@ const enrollStudent = async () => {
 const fetchRoster = async () => {
   try {
     errorMessage.value = ''
-    const response = await axios.post('http://localhost:3000/course-enrollments', {
+    const response = await axios.post('http://localhost:3000/api/course-enrollments', {
       courseId: rosterCourseId.value
     })
     enrolledStudents.value = response.data

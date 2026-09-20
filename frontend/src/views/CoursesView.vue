@@ -6,8 +6,8 @@
     <div style="margin-bottom: 20px;">
       <h3>Add a Course</h3>
       <form @submit.prevent="addCourse">
-        <div><label>Course ID: </label><input v-model="newCourse.courseId" required /></div>
-        <div><label>Course Name: </label><input v-model="newCourse.courseName" required /></div>
+        <div style="margin-bottom: 10px;"><label>Course ID: </label><input v-model="newCourse.courseId" required /></div>
+        <div style="margin-bottom: 10px;"><label>Course Name: </label><input v-model="newCourse.courseName" required /></div>
         <button type="submit" style="margin-top: 5px;">Add Course</button>
       </form>
       <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
@@ -50,7 +50,7 @@ const successMessage = ref('')
 const fetchCourses = async () => {
   try {
     errorMessage.value = ''
-    const response = await axios.get('http://localhost:3000/courses')
+    const response = await axios.get('http://localhost:3000/api/courses')
     courses.value = response.data
   } catch (err) {
     errorMessage.value = 'Failed to load courses.'
@@ -61,7 +61,7 @@ const addCourse = async () => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    const response = await axios.post('http://localhost:3000/add-course', newCourse.value)
+    const response = await axios.post('http://localhost:3000/api/add-course', newCourse.value)
     successMessage.value = response.data.message || 'Course added successfully!'
     newCourse.value = { courseId: '', courseName: '' }
     fetchCourses()
@@ -75,7 +75,7 @@ const deleteCourse = async (courseId) => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    await axios.post('http://localhost:3000/delete-course', { courseId })
+    await axios.post('http://localhost:3000/api/delete-course', { courseId })
     fetchCourses()
     successMessage.value = 'Course deleted successfully!'
   } catch (err) {

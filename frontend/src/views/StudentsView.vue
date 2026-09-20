@@ -12,18 +12,18 @@
     </div>
 
     <!-- Add Student Form -->
-    <div style="margin-bottom: 20px;">
-      <h3>Add a Student</h3>
-      <form @submit.prevent="addStudent">
-        <div><label>Name: </label><input v-model="newStudent.name" required /></div>
-        <div><label>ID: </label><input v-model="newStudent.id" required /></div>
-        <div><label>Phone: </label><input v-model="newStudent.phone" required /></div>
-        <div><label>Zip: </label><input v-model="newStudent.zip" required /></div>
-        <button type="submit" style="margin-top: 5px;">Add Student</button>
-      </form>
-      <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
-      <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
-    </div>
+  <div style="margin-bottom: 20px;">
+    <h3>Add a Student</h3>
+    <form @submit.prevent="addStudent">
+      <div style="margin-bottom: 10px;"><label>Name: </label><input v-model="newStudent.name" required /></div>
+      <div style="margin-bottom: 10px;"><label>ID: </label><input v-model="newStudent.id" required /></div>
+      <div style="margin-bottom: 10px;"><label>Phone: </label><input v-model="newStudent.phone" required /></div>
+      <div style="margin-bottom: 10px;"><label>Zip: </label><input v-model="newStudent.zip" required /></div>
+      <button type="submit" style="margin-top: 5px;">Add Student</button>
+    </form>
+    <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
+    <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
+  </div>
 
     <!-- Results Table -->
     <h3>Result:</h3>
@@ -67,7 +67,7 @@ const searchStudents = async () => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    const response = await axios.post('http://localhost:3000/find-student', { name: searchName.value })
+    const response = await axios.post('http://localhost:3000/api/find-student', { name: searchName.value })
     students.value = [response.data]
   } catch (err) {
     errorMessage.value = 'Student not found.'
@@ -87,7 +87,7 @@ const addStudent = async () => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    const response = await axios.post('http://localhost:3000/add-student', newStudent.value)
+    const response = await axios.post('http://localhost:3000/api/add-student', newStudent.value)
     successMessage.value = response.data.message || 'Student added successfully!'
     newStudent.value = { name: '', id: '', phone: '', zip: '' }
   } catch (err) {
@@ -100,7 +100,7 @@ const deleteStudent = async (name) => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    await axios.post('http://localhost:3000/delete-student', { name })
+    await axios.post('http://localhost:3000/api/delete-student', { name })
     students.value = students.value.filter(s => s.name !== name)
     successMessage.value = 'Student deleted successfully!'
   } catch (err) {

@@ -38,9 +38,9 @@ const enrollmentSchema = new mongoose.Schema({
 enrollmentSchema.index({ studentId: 1, courseId: 1 }, { unique: true });
 const Enrollment = mongoose.model('Enrollment', enrollmentSchema);
 
-// STUDENT ENDPOINTS
+// --- API STUDENT ENDPOINTS ---
 
-app.get('/students', async (req, res) => {
+app.get('/api/students', async (req, res) => {
     try {
         const students = await Student.find({});
         res.send(students);
@@ -50,7 +50,7 @@ app.get('/students', async (req, res) => {
     }
 });
 
-app.post('/find-student', async (req, res) => {
+app.post('/api/find-student', async (req, res) => {
     try {
         const { name } = req.body;
         if (!name) {
@@ -69,7 +69,7 @@ app.post('/find-student', async (req, res) => {
     }
 });
 
-app.post('/add-student', async (req, res) => {
+app.post('/api/add-student', async (req, res) => {
     try {
         const { name, id, phone, zip } = req.body;
         if (!name || !id || !phone || !zip) {
@@ -89,7 +89,7 @@ app.post('/add-student', async (req, res) => {
     }
 });
 
-app.post('/delete-student', async (req, res) => {
+app.post('/api/delete-student', async (req, res) => {
     try {
         const { name } = req.body;
         if (!name) {
@@ -108,9 +108,9 @@ app.post('/delete-student', async (req, res) => {
     }
 });
 
-// COURSE ENDPOINTS
+// --- API COURSE ENDPOINTS ---
 
-app.get('/courses', async (req, res) => {
+app.get('/api/courses', async (req, res) => {
     try {
         const courses = await Course.find({});
         res.send(courses);
@@ -120,7 +120,7 @@ app.get('/courses', async (req, res) => {
     }
 });
 
-app.post('/add-course', async (req, res) => {
+app.post('/api/add-course', async (req, res) => {
     try {
         const { courseId, courseName } = req.body;
         if (!courseId || !courseName) {
@@ -140,7 +140,7 @@ app.post('/add-course', async (req, res) => {
     }
 });
 
-app.post('/delete-course', async (req, res) => {
+app.post('/api/delete-course', async (req, res) => {
     try {
         const { courseId } = req.body;
         if (!courseId) {
@@ -159,16 +159,16 @@ app.post('/delete-course', async (req, res) => {
     }
 });
 
-// ENROLLMENT ENDPOINTS
+// --- API ENROLLMENT ENDPOINTS ---
 
-app.post('/enroll-student', async (req, res) => {
+app.post('/api/enroll-student', async (req, res) => {
     try {
         const { studentId, courseId } = req.body;
         if (!studentId || !courseId) {
             return res.status(400).send({ error: 'Both student ID and course ID are required' });
         }
 
-        const newEnrollment = new Enrollment({ studentId, courseId });
+    const newEnrollment = new Enrollment({ studentId, courseId });
         await newEnrollment.save();
 
         res.status(201).send({ message: 'Student enrolled successfully!', enrollment: newEnrollment });
@@ -181,7 +181,7 @@ app.post('/enroll-student', async (req, res) => {
     }
 });
 
-app.post('/course-enrollments', async (req, res) => {
+app.post('/api/course-enrollments', async (req, res) => {
     try {
         const { courseId } = req.body;
         if (!courseId) {
@@ -199,18 +199,17 @@ app.post('/course-enrollments', async (req, res) => {
     }
 });
 
-// Serve Vue production build assets from the frontend dist folder
+// --- Production Frontend Serving & Fallback ---
 const frontendDistPath = path.join(__dirname, '../frontend/dist'); 
 app.use(express.static(frontendDistPath));
 
-// Fallback to index.html for Vue Router (SPA support)
-// Use a regular expression catch-all to prevent path-to-regexp errors
-app.get(/^[^\/].*$/, (req, res) => {
+// Fallback to index.html for Vue Router (SPA support) on refresh
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
