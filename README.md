@@ -147,7 +147,7 @@ Maintain valid relationships among students, courses, and enrollments.
 
 ### Requirement 7: Production Build and Local Deployment
 
-Configure the project so the frontend can be compiled as a production build with:
+Configure the frontend so it can be compiled as a production build from the `frontend` directory with:
 
 ```bash
 npm run build
@@ -165,7 +165,7 @@ npm start
 
 After startup, the application must be accessible in a browser through the documented `localhost` address. Opening the old frontend HTML files directly is not an acceptable deployment method.
 
-You may use either a root-level npm configuration that coordinates the frontend and backend or clearly documented npm commands in the appropriate project directory. In either case, `npm run build` must build the Vue frontend, and the backend must serve the resulting production files.
+You may use either a root-level npm configuration that coordinates the frontend and backend or clearly documented npm commands in the appropriate project directories. In either case, the documented `npm run build` command must build the Vue frontend, and the backend must serve the resulting production files.
 
 ### Requirement 8: User Interface Design
 
@@ -322,4 +322,3 @@ Your work will be evaluated for:
 - code organization and maintainability;
 - required interface quality and accessibility; and
 - clear documentation and user experience.
-

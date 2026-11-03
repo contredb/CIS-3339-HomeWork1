@@ -68,16 +68,17 @@ To install all required dependencies for both the backend and frontend, run the 
 ---
 
 ## Installation & Deployment Workflow
-Run the following commands in order to install dependencies, build the frontend, and start the production server:
+Run the following commands from the repository root in order to install dependencies, build the frontend, and start the production server:
 
-```bash
-# 1. Install dependencies for backend and frontend
+```cmd
+cd backend
 npm install
 
-# 2. Build the Vue 3 frontend for production
+cd ..\frontend
+npm install
 npm run build
 
-# 3. Start the application backend (which serves the built frontend)
+cd ..\backend
 npm start
 ```
 
@@ -102,7 +103,7 @@ npm run build
 To start the Express backend server (which also serves the built frontend application in production):
 ```bash
 cd backend
-node server.js
+npm start
 ```
 
 ---
