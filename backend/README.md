@@ -31,6 +31,7 @@ The application operates on a decoupled client-server architecture that comes to
    * Connects locally to MongoDB Community Edition using environment variables defined in the backend `.env` file[cite: 1].
    * Uses **Mongoose** schemas and models to structure, validate, and persist data cleanly.
    * Features automatic schema and collection generation, meaning the application initializes smoothly against a fresh, empty local database on first startup without requiring manual migration or seeding scripts[cite: 1].
+   * Deleting a student or course also deletes its associated enrollments, preventing those records from resurfacing if the same ID is added again.
 
 # Full-Stack Vue 3, Express, and MongoDB Application
 

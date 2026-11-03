@@ -96,10 +96,13 @@ app.post('/api/delete-student', async (req, res) => {
             return res.status(400).send({ error: 'Student name is required' });
         }
 
-        const deletedStudent = await Student.findOneAndDelete({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+        const deletedStudent = await Student.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
         if (!deletedStudent) {
             return res.status(404).send({ error: 'Student not found' });
         }
+
+        await Enrollment.deleteMany({ studentId: deletedStudent.id });
+        await Student.deleteOne({ _id: deletedStudent._id });
 
         res.send({ message: 'Student deleted successfully', student: deletedStudent });
     } catch (error) {
@@ -147,10 +150,13 @@ app.post('/api/delete-course', async (req, res) => {
             return res.status(400).send({ error: 'Course ID is required' });
         }
 
-        const deletedCourse = await Course.findOneAndDelete({ courseId });
+        const deletedCourse = await Course.findOne({ courseId });
         if (!deletedCourse) {
             return res.status(404).send({ error: 'Course not found' });
         }
+
+        await Enrollment.deleteMany({ courseId: deletedCourse.courseId });
+        await Course.deleteOne({ _id: deletedCourse._id });
 
         res.send({ message: 'Course deleted successfully', course: deletedCourse });
     } catch (error) {
