@@ -9,7 +9,7 @@
           Select Student
           <select v-model="selectedStudentId" required>
             <option disabled value="">-- Choose a Student --</option>
-            <option v-for="student in students" :key="student.id" :value="student.id">
+            <option v-for="student in catalogStore.students" :key="student.id" :value="student.id">
               {{ student.name }} (ID: {{ student.id }})
             </option>
           </select>
@@ -19,7 +19,7 @@
           Select Course
           <select v-model="selectedCourseId" required>
             <option disabled value="">-- Choose a Course --</option>
-            <option v-for="course in courses" :key="course.courseId" :value="course.courseId">
+            <option v-for="course in catalogStore.courses" :key="course.courseId" :value="course.courseId">
               {{ course.courseName }} (Code: {{ course.courseId }})
             </option>
           </select>
@@ -38,7 +38,7 @@
           Select Course
           <select v-model="rosterCourseId" @change="fetchRoster">
             <option disabled value="">-- Choose a Course --</option>
-            <option v-for="course in courses" :key="course.courseId" :value="course.courseId">
+            <option v-for="course in catalogStore.courses" :key="course.courseId" :value="course.courseId">
               {{ course.courseName }} (Code: {{ course.courseId }})
             </option>
           </select>
@@ -75,9 +75,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useCatalogStore } from '../stores/catalog'
 
-const students = ref([])
-const courses = ref([])
+const catalogStore = useCatalogStore()
 const selectedStudentId = ref('')
 const selectedCourseId = ref('')
 const rosterCourseId = ref('')
@@ -86,14 +86,9 @@ const enrolledStudents = ref([])
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Load students and courses from backend for dropdowns
 const fetchDropdownData = async () => {
   try {
-    const studentRes = await axios.get('http://localhost:3000/api/students')
-    students.value = studentRes.data
-
-    const courseRes = await axios.get('http://localhost:3000/api/courses')
-    courses.value = courseRes.data
+    await Promise.all([catalogStore.fetchStudents(), catalogStore.fetchCourses()])
   } catch (err) {
     errorMessage.value = 'Failed to load dropdown data from backend.'
   }

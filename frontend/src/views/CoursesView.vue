@@ -25,12 +25,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="course in courses" :key="course.courseId">
+            <tr v-for="course in catalogStore.courses" :key="course.courseId">
               <td>{{ course.courseId }}</td>
               <td>{{ course.courseName }}</td>
               <td><button class="button-danger" @click="deleteCourse(course.courseId)">Delete</button></td>
             </tr>
-            <tr v-if="courses.length === 0">
+            <tr v-if="catalogStore.courses.length === 0">
               <td colspan="3" class="empty-state">No courses found</td>
             </tr>
           </tbody>
@@ -42,9 +42,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { useCatalogStore } from '../stores/catalog'
 
-const courses = ref([])
+const catalogStore = useCatalogStore()
 const newCourse = ref({ courseId: '', courseName: '' })
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -52,8 +52,7 @@ const successMessage = ref('')
 const fetchCourses = async () => {
   try {
     errorMessage.value = ''
-    const response = await axios.get('http://localhost:3000/api/courses')
-    courses.value = response.data
+    await catalogStore.fetchCourses()
   } catch (err) {
     errorMessage.value = 'Failed to load courses.'
   }
@@ -63,10 +62,9 @@ const addCourse = async () => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    const response = await axios.post('http://localhost:3000/api/add-course', newCourse.value)
-    successMessage.value = response.data.message || 'Course added successfully!'
+    const response = await catalogStore.addCourse(newCourse.value)
+    successMessage.value = response.message || 'Course added successfully!'
     newCourse.value = { courseId: '', courseName: '' }
-    fetchCourses()
   } catch (err) {
     successMessage.value = ''
     errorMessage.value = err.response?.data?.error || 'Failed to add course. ID might be a duplicate.'
@@ -77,8 +75,7 @@ const deleteCourse = async (courseId) => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    await axios.post('http://localhost:3000/api/delete-course', { courseId })
-    fetchCourses()
+    await catalogStore.deleteCourse(courseId)
     successMessage.value = 'Course deleted successfully!'
   } catch (err) {
     errorMessage.value = 'Failed to delete course.'

@@ -57,9 +57,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios'
+import { useCatalogStore } from '../stores/catalog'
 
+const catalogStore = useCatalogStore()
 const students = ref([])
 const searchName = ref('')
 const newStudent = ref({ name: '', id: '', phone: '', zip: '' })
@@ -90,8 +92,8 @@ const addStudent = async () => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    const response = await axios.post('http://localhost:3000/api/add-student', newStudent.value)
-    successMessage.value = response.data.message || 'Student added successfully!'
+    const response = await catalogStore.addStudent(newStudent.value)
+    successMessage.value = response.message || 'Student added successfully!'
     newStudent.value = { name: '', id: '', phone: '', zip: '' }
   } catch (err) {
     successMessage.value = ''
@@ -103,11 +105,19 @@ const deleteStudent = async (name) => {
   try {
     errorMessage.value = ''
     successMessage.value = ''
-    await axios.post('http://localhost:3000/api/delete-student', { name })
-    students.value = students.value.filter(s => s.name !== name)
+    const response = await catalogStore.deleteStudent(name)
+    students.value = students.value.filter(student => student.id !== response.student.id)
     successMessage.value = 'Student deleted successfully!'
   } catch (err) {
     errorMessage.value = 'Failed to delete student.'
   }
 }
+
+onMounted(async () => {
+  try {
+    await catalogStore.fetchStudents()
+  } catch (err) {
+    errorMessage.value = 'Failed to load students.'
+  }
+})
 </script>
