@@ -1,41 +1,43 @@
 <template>
-  <div>
-    <h2>Course Management</h2>
+  <main class="page">
+    <h1 class="page-title">Course Management</h1>
 
-    <!-- Add Course Form -->
-    <div style="margin-bottom: 20px;">
-      <h3>Add a Course</h3>
-      <form @submit.prevent="addCourse">
-        <div style="margin-bottom: 10px;"><label>Course ID: </label><input v-model="newCourse.courseId" required /></div>
-        <div style="margin-bottom: 10px;"><label>Course Name: </label><input v-model="newCourse.courseName" required /></div>
-        <button type="submit" style="margin-top: 5px;">Add Course</button>
+    <section class="card">
+      <h2>Add a Course</h2>
+      <form class="form-grid" @submit.prevent="addCourse">
+        <label class="field">Course ID<input v-model="newCourse.courseId" required /></label>
+        <label class="field">Course Name<input v-model="newCourse.courseName" required /></label>
+        <div class="form-actions"><button type="submit">Add Course</button></div>
       </form>
-      <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
-      <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
-    </div>
+      <p v-if="errorMessage" class="feedback feedback-error" role="alert">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="feedback feedback-success" role="status">{{ successMessage }}</p>
+    </section>
 
-    <!-- Courses List Table -->
-    <h3>Courses List:</h3>
-    <table border="1" cellpadding="5" style="border-collapse: collapse;">
-      <thead>
-        <tr>
-          <th>Course ID</th>
-          <th>Course Name</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="course in courses" :key="course.courseId">
-          <td>{{ course.courseId }}</td>
-          <td>{{ course.courseName }}</td>
-          <td><button @click="deleteCourse(course.courseId)">Delete</button></td>
-        </tr>
-        <tr v-if="courses.length === 0">
-          <td colspan="3" style="text-align: center;">No courses found</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <section class="card table-card">
+      <h2>Courses List</h2>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Course ID</th>
+              <th>Course Name</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="course in courses" :key="course.courseId">
+              <td>{{ course.courseId }}</td>
+              <td>{{ course.courseName }}</td>
+              <td><button class="button-danger" @click="deleteCourse(course.courseId)">Delete</button></td>
+            </tr>
+            <tr v-if="courses.length === 0">
+              <td colspan="3" class="empty-state">No courses found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 </template>
 
 <script setup>

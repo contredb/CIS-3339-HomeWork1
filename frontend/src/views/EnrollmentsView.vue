@@ -1,73 +1,75 @@
 <template>
-  <div>
-    <h2>Enrollment Management</h2>
+  <main class="page">
+    <h1 class="page-title">Enrollment Management</h1>
 
-    <!-- Enroll Student Form -->
-    <div style="margin-bottom: 30px">
-      <h3>Enroll a Student in a Course</h3>
-      <form @submit.prevent="enrollStudent">
-        <div style="margin-bottom: 10px;">
-          <label>Select Student: </label>
+    <section class="card">
+      <h2>Enroll a Student in a Course</h2>
+      <form class="form-grid" @submit.prevent="enrollStudent">
+        <label class="field">
+          Select Student
           <select v-model="selectedStudentId" required>
             <option disabled value="">-- Choose a Student --</option>
             <option v-for="student in students" :key="student.id" :value="student.id">
               {{ student.name }} (ID: {{ student.id }})
             </option>
           </select>
-        </div>
+        </label>
 
-        <div style="margin-bottom: 10px;">
-          <label>Select Course: </label>
+        <label class="field">
+          Select Course
           <select v-model="selectedCourseId" required>
             <option disabled value="">-- Choose a Course --</option>
             <option v-for="course in courses" :key="course.courseId" :value="course.courseId">
               {{ course.courseName }} (Code: {{ course.courseId }})
             </option>
           </select>
-        </div>
+        </label>
 
-        <button type="submit">Enroll Student</button>
+        <div class="form-actions"><button type="submit">Enroll Student</button></div>
       </form>
-      <p v-if="errorMessage" style="color: red;">{{ errorMessage }}</p>
-      <p v-if="successMessage" style="color: green;">{{ successMessage }}</p>
-    </div>
+      <p v-if="errorMessage" class="feedback feedback-error" role="alert">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="feedback feedback-success" role="status">{{ successMessage }}</p>
+    </section>
 
-    <!-- View Course Roster -->
-    <div>
-      <h3>View Course Roster</h3>
-      <div style="margin-bottom: 10px;">
-        <label>Select Course to View Roster: </label>
-        <select v-model="rosterCourseId" @change="fetchRoster">
-          <option disabled value="">-- Choose a Course --</option>
-          <option v-for="course in courses" :key="course.courseId" :value="course.courseId">
-            {{ course.courseName }} (Code: {{ course.courseId }})
-          </option>
-        </select>
+    <section class="card table-card">
+      <h2>View Course Roster</h2>
+      <div class="roster-filter">
+        <label class="field">
+          Select Course
+          <select v-model="rosterCourseId" @change="fetchRoster">
+            <option disabled value="">-- Choose a Course --</option>
+            <option v-for="course in courses" :key="course.courseId" :value="course.courseId">
+              {{ course.courseName }} (Code: {{ course.courseId }})
+            </option>
+          </select>
+        </label>
       </div>
 
-      <table border="1" cellpadding="5" style="border-collapse: collapse; width: auto; min-width: 450px;">
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>ID</th>
-            <th>Phone</th>
-            <th>Zip</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="student in enrolledStudents" :key="student.id">
-            <td>{{ student.name }}</td>
-            <td>{{ student.id }}</td>
-            <td>{{ student.phone }}</td>
-            <td>{{ student.zip }}</td>
-          </tr>
-          <tr v-if="enrolledStudents.length === 0">
-            <td colspan="4" style="text-align: center;">No students enrolled in this course</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>ID</th>
+              <th>Phone</th>
+              <th>Zip</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="student in enrolledStudents" :key="student.id">
+              <td>{{ student.name }}</td>
+              <td>{{ student.id }}</td>
+              <td>{{ student.phone }}</td>
+              <td>{{ student.zip }}</td>
+            </tr>
+            <tr v-if="enrolledStudents.length === 0">
+              <td colspan="4" class="empty-state">No students enrolled in this course</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 </template>
 
 <script setup>
